@@ -67,27 +67,29 @@ var start = function () {
             }
         }])
             .then(function (resp) {
-                connection.query('select product_name,stock_quantity from products where ?', {
-                    item_id: resp.product.split("||")[0]
-                }, function (err, data) {
-                    if (err) throw err
+                connection.query(`SELECT product_name,stock_quantity 
+                                  FROM products 
+                                  WHERE ?`, {
+                        item_id: resp.product.split("||")[0]
+                    }, function (err, data) {
+                        if (err) throw err
 
-                    if (data[0].stock_quantity >= resp.quantity) {
-                        console.log(`Order confirmed : ${data[0].product_name} X ${resp.quantity}`)
+                        if (data[0].stock_quantity >= resp.quantity) {
+                            console.log(`Order confirmed : ${data[0].product_name} X ${resp.quantity}`)
 
-                        connection.query(
-                            `
-                            Update products 
-                            set stock_quantity = ?
-                            where item_id = ?
+                            connection.query(
+                                `
+                            UPDATE products 
+                            SET stock_quantity = ?
+                            WHERE item_id = ?
                             `, [data[0].stock_quantity - resp.quantity, resp.product.split("||")[0]])
-                        return initQuestion()
-                    }
-                    else {
-                        console.log('Unable to fufil order due to lack of stock')
-                        return initQuestion()
-                    }
-                })
+                            return initQuestion()
+                        }
+                        else {
+                            console.log('Unable to fufil order due to lack of stock')
+                            return initQuestion()
+                        }
+                    })
             })
     })
 }
