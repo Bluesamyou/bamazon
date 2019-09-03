@@ -16,10 +16,24 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err
 
-    console.log(`CONNECTED WITH THREAD ID: ${connection.threadId}`)
+    console.log(`CONNECTED WITH THREAD ID: ${connection.threadId} \n`)
 
-    start()
+    initQuestion()
 })
+
+var initQuestion = function () {
+    inquirer.prompt({
+        name: 'action',
+        type: 'list',
+        choices: ["Purchase a product", "Exit"],
+        message: "What would you like to do today?"
+    })
+        .then(function (resp) {
+            if (resp.action === "Purchase a product") return start()
+
+            connection.end()
+        })
+}
 
 // Starts the program
 var start = function () {
@@ -27,7 +41,6 @@ var start = function () {
     connection.query('select * from products', function (err, data) {
         if (err) throw err
 
-        console.log(data.length)
 
         var choiceArray = []
 
@@ -35,11 +48,10 @@ var start = function () {
             choiceArray.push(`${product.item_id}||${product.product_name}`)
         })
 
-        console.log(choiceArray)
 
         inquirer.prompt([{
             name: 'product',
-            type: 'rawlist',
+            type: 'list',
             choices: choiceArray,
             message: "Which Item would you like to buy"
         },
@@ -61,17 +73,19 @@ var start = function () {
                     if (err) throw err
 
                     if (data[0].stock_quantity >= resp.quantity) {
-                        console.log(`Order confirmed : ${data[0].product_name} X ${data[0].stock_quantity}`)
+                        console.log(`Order confirmed : ${data[0].product_name} X ${resp.quantity}`)
 
                         connection.query(
                             `
-                            Update table products 
-                            set ?? = ?
-                            where id = ?
-                            `, ['stock_quantity', data[0].stock_quantity - resp.quantity, resp.product.split("||")[0]])
+                            Update products 
+                            set stock_quantity = ?
+                            where item_id = ?
+                            `, [data[0].stock_quantity - resp.quantity, resp.product.split("||")[0]])
+                        return initQuestion()
                     }
                     else {
                         console.log('Unable to fufil order due to lack of stock')
+                        return initQuestion()
                     }
                 })
             })
