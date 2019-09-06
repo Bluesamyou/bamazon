@@ -3,7 +3,6 @@ const inquirer = require('inquirer')
 const dotenv = require('dotenv').config()
 
 
-// Setup connection params
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -12,7 +11,6 @@ var connection = mysql.createConnection({
     password: process.env.DB_PASS
 })
 
-// Initialise connection
 connection.connect(function (err) {
     if (err) throw err
 
@@ -35,9 +33,8 @@ var initQuestion = function () {
         })
 }
 
-// Starts the program
 var start = function () {
-    // Fetches all available products
+
     connection.query('select * from products', function (err, data) {
         if (err) throw err
 
