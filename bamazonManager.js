@@ -40,14 +40,62 @@ const start = function () {
                 addProduct()
             }
             else {
-                return null
+                connection.end()
             }
         })
 
 }
 
 const addInventory = function () {
+    connection.query('SELECT * FROM products', function (err, data) {
+        if (err) throw err
 
+        var itemsArray = []
+
+        data.forEach(function (row) {
+            itemsArray.push(row.product_name)
+        })
+
+        inquirer.prompt([{
+            type: 'list',
+            choices: itemsArray,
+            message: "Select an item to add stock to",
+            name: "item"
+        }, {
+            type: "number",
+            message: "Enter the number of items you wish to add to stock",
+            name: "stock",
+            validate: function (input) {
+
+                if (!isNaN(input)) {
+                    return true
+                }
+            }
+        }])
+            .then((resp) => {
+                connection.query(`
+                                  SELECT stock_quantity 
+                                  FROM products
+                                  WHERE product_name = ?`, [resp.item],
+                    function (err, data) {
+                        if (err) throw err
+
+                        connection.query(`
+                                      UPDATE products
+                                      SET stock_quantity = ?
+                                      WHERE product_name = ?;                  
+                                      `, [(resp.stock + data[0].stock_quantity), resp.item],
+                            function (err, data) {
+                                if (err) throw err
+
+                                console.log(`UPDATED QUANTITY SUCCESFULLY FOR ${resp.item} \n`)
+
+                                return start()
+                            })
+                    })
+
+            })
+    })
 
 }
 

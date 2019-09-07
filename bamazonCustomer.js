@@ -64,7 +64,7 @@ var start = function () {
             }
         }])
             .then(function (resp) {
-                connection.query(`SELECT product_name,stock_quantity 
+                connection.query(`SELECT product_name,stock_quantity, product_sales, price 
                                   FROM products 
                                   WHERE ?`, {
                         item_id: resp.product.split("||")[0]
@@ -77,9 +77,9 @@ var start = function () {
                             connection.query(
                                 `
                             UPDATE products 
-                            SET stock_quantity = ?
+                            SET stock_quantity = ?, product_sales = ? 
                             WHERE item_id = ?
-                            `, [data[0].stock_quantity - resp.quantity, resp.product.split("||")[0]])
+                            `, [data[0].stock_quantity - resp.quantity, (product_sales + (quantity * price)), resp.product.split("||")[0]])
                             return initQuestion()
                         }
                         else {
