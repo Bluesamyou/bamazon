@@ -79,7 +79,7 @@ var start = function () {
                             UPDATE products 
                             SET stock_quantity = ?, product_sales = ? 
                             WHERE item_id = ?
-                            `, [data[0].stock_quantity - resp.quantity, (product_sales + (quantity * price)), resp.product.split("||")[0]])
+                            `, [data[0].stock_quantity - resp.quantity, (data[0].product_sales + (resp.quantity * data[0].price)), resp.product.split("||")[0]])
                             return initQuestion()
                         }
                         else {

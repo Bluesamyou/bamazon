@@ -12,7 +12,8 @@ CREATE TABLE products
    department_name VARCHAR
     (100),
    price DECIMAL NOT NULL, 
-   stock_quantity INTEGER NOT NULL
+   stock_quantity INTEGER NOT NULL, 
+   product_sales INTEGER DEFAULT 0
 );
 
     INSERT INTO products
@@ -27,8 +28,17 @@ CREATE TABLE products
         ("TRAVELAMBO RFID Blocking Wallet", "Fashion", 19.99, 100),
         ("AMAZONBASICS Silicone Baking Matt", "Cooking", 9.62, 200),
         ("MAXSOFT Scalp Care Brush", "Healthcare", 6.98, 21),
-        ("GORILLA GRIP Bath Pillow", "Bedding", 15.99, 29)
+        ("GORILLA GRIP Bath Pillow", "Bedding", 15.99, 29);
+
+    CREATE TABLE departments
+    (
+        department_id INTEGER
+        AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    department_name VARCHAR
+        (100) NOT NULL, 
+    over_head_costs DECIMAL DEFAULT 0
+);
 
 
-
-
+        select *
+        from products;
